@@ -1,12 +1,12 @@
-from core.Image import Image
-from core.Histogram import Histogram
-from core.Equalizer import Equalizer
+from core.plugins.Image import Image
+from core.plugins.Histogram import Histogram
+from core.plugins.Equalizer import Equalizer
 from pathlib import Path
 
 if __name__ == "__main__":
     # --- PASSO 1 - Leitura e análise da imagem ---
     # Caminho da imagem original
-    path = Path("../assets/polen.png")
+    path = Path("../../assets/polen.png")
 
     # Matriz da imagem original carregada na variável data
     data = Image.get_data_from_file(path)
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     # --- PASSO 3 - Especificação do histograma ---
     # Carregando o caminho da imagem de referência
-    esp_path = Path("../assets/niki_lauda.jpg")
+    esp_path = Path("../../assets/niki_lauda.jpg")
 
     # adquirindo a matriz da imagem de referência
     esp_data = Image.get_data_from_file(esp_path)

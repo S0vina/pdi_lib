@@ -43,7 +43,7 @@ class Image:
     def save_img(cls, self, path: Union[str, Path]) -> None:
         cv2.imwrite(path, self._data)
 
-    def plot_img(self, window_name: str = ""):
+    def plot_img(self):
         while True:
             cv2.imshow(self.name, self.data)
 

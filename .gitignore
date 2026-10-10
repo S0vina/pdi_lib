@@ -1,6 +1,13 @@
+# __pyache__
 *.pyc
-__pycache__/
+
+# assets
 *.jpg
 *.jpeg
 *.png
 *.bmp
+
+# Python / Build artifacts
+*.egg-info/
+build/
+dist/
