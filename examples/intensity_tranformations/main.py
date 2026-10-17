@@ -18,3 +18,8 @@ if __name__ == "__main__":
     neg_img = Image(neg_data, "neg_niki")
 
     neg_img.plot_img()
+
+    log_data = IntesityTransforms.logaritmic(img, 25)
+    log_img = Image(log_data, "log_niki")
+
+    log_img.plot_img()
