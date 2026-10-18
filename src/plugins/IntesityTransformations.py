@@ -37,3 +37,17 @@ class IntesityTransforms:
                 neg_img[i][j] = bigger_intesity - 1 - img.data[i][j]
 
         return neg_img
+
+    @classmethod
+    def logaritmic(cls, img: Image, const: int) -> np.ndarray:
+        if not isinstance(img, Image):
+            raise TypeError("The method needs an Image type object")
+
+        log_img = np.zeros_like(img.data)
+        rows, colums = img.shape
+
+        for i in range(rows):
+            for j in range(colums):
+                log_img[i][j] = const * np.log(1 + img.data[i][j])
+
+        return log_img
