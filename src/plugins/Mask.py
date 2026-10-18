@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Mask:
-    MEAN = "mean"
+    LOW_PASS = ""
     GAUSSIAN = "gaussian"
 
     @classmethod
@@ -19,7 +19,7 @@ class Mask:
         if mask_type is None:
             raise ValueError("mask type should be specified")
 
-        if mask_type == cls.MEAN:
+        if mask_type == cls.LOW_PASS:
             pass
 
         if mask_type == cls.GAUSSIAN:
