@@ -21,7 +21,7 @@ class Image:
         return self._img_name
 
     @property
-    def shape(self) -> Tuple[int, ...]:
+    def shape(self) -> Tuple[int, int]:
         return self._data.shape
 
     @property
