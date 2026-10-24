@@ -16,16 +16,17 @@ class Mask:
         return (self.height, self.width)
 
     @classmethod
-    def null_shape(cls, height: int, width: int) -> Self:
+    def any_shape(cls, height: int, width: int, weight: float) -> Self:
         if height < 0 or width < 0:
             raise ValueError("height and width values should be greater than 0")
 
-        array = np.zeros((height, width))
+        array = np.full((height, width), weight)
 
         return cls(array, height, width)
 
     @classmethod
-    def from_type(cls, mask_type=None, n: int = 3) -> Self:
+    def from_type(cls, mask_type, n: int = 3) -> Self:
+        print(mask_type)
         if mask_type is None:
             raise ValueError("mask type should be specified")
 
@@ -33,13 +34,13 @@ class Mask:
             raise ValueError("a pair mask is not implemented in this lib")
 
         if mask_type == cls.LOW_PASS:
-            array = np.full((n, n), 1, dtype=int)
-            return cls(array, n, n)
+            weight = 1.0 / (n * n)
+            return cls.any_shape(n, n, weight)
 
         if mask_type == cls.GAUSSIAN:
             pass
 
-        return cls(-1, -1, -1)
+        raise ValueError(f"Unknown mask type: {mask_type}")
 
     def it_fits(self, i: int, j: int, img_t: Tuple[int, int]) -> bool:
         img_h, img_w = img_t
@@ -54,12 +55,11 @@ class Mask:
         return True
 
     @classmethod
-    def flip(cls, m: Self) -> Self:
-        mask_h, mask_w = m.shape
-        instance = cls.null_shape(mask_h, mask_w)
-
+    def flip(cls, mask: Self) -> Self:
+        mask_h, mask_w = mask.shape
+        array = np.zeros((mask_h, mask_w))
         for i in range(mask_h):
             for j in range(mask_w):
-                instance.array[i][j] = m.array[mask_h - i - 1][mask_w - j - 1]
+                array[i][j] = mask.array[mask_h - i - 1][mask_w - j - 1]
 
-        return instance
+        return cls(array, mask_h, mask_w)
