@@ -1,0 +1,75 @@
+from typing import Self, Tuple
+import numpy as np
+
+
+class Mask:
+    LOW_PASS = "low_pass"
+    GAUSSIAN = "gaussian"
+
+    def __init__(self):
+        self.height = 0
+        self.width = 0
+        self.array = None
+
+    @property
+    def shape(self):
+        return (self.height, self.width)
+
+    @property
+    def data(self):
+        return self.array
+
+    @classmethod
+    def null_shape(cls, height: int, width: int) -> Self:
+        if height < 0 or width < 0:
+            raise ValueError("height and width values should be greater than 0")
+
+        mask = cls()
+        mask.array = np.zeros((height, width))
+        mask.height = height
+        mask.width = width
+
+        return mask
+
+    @classmethod
+    def from_type(cls, mask_type=None, n: int = 3) -> Self:
+        if mask_type is None:
+            raise ValueError("mask type should be specified")
+
+        if n % 2 != 1:
+            raise ValueError("a pair mask is not implemented in this lib")
+
+        mask = cls()
+        mask.height = n
+        mask.width = n
+
+        if mask_type == cls.LOW_PASS:
+            mask.array = np.full((n, n), 1, dtype=int)
+
+        if mask_type == cls.GAUSSIAN:
+            pass
+
+        return mask
+
+    def it_fits(self, i: int, j: int, img_t: Tuple[int, int]) -> bool:
+        img_h, img_w = img_t
+        mask_h, mask_w = self.shape
+
+        # Verifica se a máscara ultrapassa a altura ou largura da imagem
+        if i + mask_h > img_h:
+            return False
+        if j + mask_w > img_w:
+            return False
+
+        return True
+
+    @classmethod
+    def flip(cls, m: Self) -> Self:
+        mask_h, mask_w = m.shape
+        instance = cls.null_shape(mask_h, mask_w)
+
+        for i in range(mask_h):
+            for j in range(mask_w):
+                instance.array[i][j] = m.array[mask_h - i - 1][mask_w - j - 1]
+
+        return instance

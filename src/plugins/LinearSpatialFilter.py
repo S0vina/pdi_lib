@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from src.plugins.Image import Image
 from src.plugins.Mask import Mask
 import numpy as np
@@ -15,13 +13,14 @@ class LinearSpatialFilter:
         mask_h, mask_w = mask.shape
 
         n_img = np.zeros_like(img.data)
+        flip_mask = Mask.flip(mask)
 
         for i in range(img_h):
             for j in range(img_w):
-                if LinearSpatialFilter.it_fits(i, j, mask.shape, img.shape):
+                if flip_mask.it_fits(i, j, img.shape):
                     roi = img.data[i : i + mask_h, j : j + mask_w]
 
-                    n_img[i][j] = min(255, max(0, np.sum(roi * mask)))
+                    n_img[i][j] = min(255, max(0, np.sum(roi * flip_mask)))
 
         return n_img
 
@@ -34,7 +33,7 @@ class LinearSpatialFilter:
 
         for i in range(img_h):
             for j in range(img_w):
-                if LinearSpatialFilter.it_fits(i, j, mask.shape, img.shape):
+                if mask.it_fits(i, j, img.shape):
                     roi = img.data[i : i + mask_h, j : j + mask_w]
 
                     n_img[i][j] = min(255, max(0, np.sum(roi * mask)))
