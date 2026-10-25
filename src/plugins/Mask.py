@@ -1,4 +1,4 @@
-from typing import Self, Tuple
+from typing import List, Self, Tuple
 import numpy as np
 
 
@@ -53,6 +53,19 @@ class Mask:
             return False
 
         return True
+
+    def get_list(self, center_i: int, center_j: int, img_data: np.ndarray) -> list:
+        mask_h, mask_w = self.shape
+        flat_roi = []
+
+        half_h = mask_h // 2
+        half_w = mask_w // 2
+
+        for r in range(center_i - half_h, center_i + half_h + 1):
+            for c in range(center_j - half_w, center_j + half_w + 1):
+                flat_roi.append(img_data[r][c])
+
+        return flat_roi
 
     @classmethod
     def flip(cls, mask: Self) -> Self:
