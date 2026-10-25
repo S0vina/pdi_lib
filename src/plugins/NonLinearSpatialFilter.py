@@ -12,7 +12,7 @@ class NonLinearSpatialFilter:
         if n % 2 != 1:
             raise ValueError("Median method should have a quadratic roi")
         img_h, img_w = img.shape
-        matriz = np.zeros((img_h, img_w))
+        matriz = np.zeros((img_h, img_w), dtype=np.uint8)
         fit_mask = Mask.any_shape(n, n, 0)
         center = (n * n) // 2
 
