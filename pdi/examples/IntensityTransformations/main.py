@@ -1,6 +1,7 @@
 from pathlib import Path
 from src.plugins.IntesityTransformations import IntesityTransforms
 from src.plugins.Image import Image
+from src.plugins.NonLinearSpatialFilter import NonLinearSpatialFilter
 
 if __name__ == "__main__":
     path = Path("../../assets/niki_lauda.jpg")
@@ -21,5 +22,9 @@ if __name__ == "__main__":
 
     log_data = IntesityTransforms.logaritmic(img, 25)
     log_img = Image(log_data, "log_niki")
-
     log_img.plot_img()
+
+    median_data = NonLinearSpatialFilter.median(neg_img)
+    median_img = Image(neg_data, "neg_niki")
+
+    median_img.plot_img()
