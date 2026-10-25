@@ -1,4 +1,4 @@
-from .Image import Image
+from pdi import Image
 import numpy as np
 
 

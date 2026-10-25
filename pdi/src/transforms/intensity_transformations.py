@@ -1,8 +1,8 @@
-from .Image import Image
+from pdi import Image
 import numpy as np
 
 
-class IntesityTransforms:
+class IntensityTransforms:
     def __init__(self) -> None:
         pass
 
