@@ -5,9 +5,14 @@ import numpy as np
 class Mask:
     LOW_PASS = "low_pass"
     GAUSSIAN = "gaussian"
+    LAPLASSIAN = "laplassian"
+    FOUR_NEIGHBOR = "4_neighbor"
+    EIGHT_NEIGHBOR = "8-neighbor"
 
-    def __init__(self, array, h: int, w: int):
+    def __init__(self, array, mt, mn, h: int, w: int):
         self.array = array
+        self.mask_type = mt
+        self.mask_neighbor = mn
         self.height = h
         self.width = w
 
@@ -16,29 +21,55 @@ class Mask:
         return (self.height, self.width)
 
     @classmethod
-    def any_shape(cls, height: int, width: int, weight: float) -> Self:
+    def any_shape(
+        cls, mask_type, mask_neighbor, height: int, width: int, weight: float
+    ) -> Self:
         if height < 0 or width < 0:
             raise ValueError("height and width values should be greater than 0")
 
         array = np.full((height, width), weight)
 
-        return cls(array, height, width)
+        return cls(array, mask_type, mask_neighbor, height, width)
 
     @classmethod
-    def from_type(cls, mask_type, n: int = 3) -> Self:
+    def from_type(cls, mask_type, mask_neighbor, n: int = 3) -> Self:
         print(mask_type)
         if mask_type is None:
             raise ValueError("mask type should be specified")
+
+        if mask_neighbor is None:
+            raise ValueError("should specify what neighborhood is taken")
 
         if n % 2 != 1:
             raise ValueError("a pair mask is not implemented in this lib")
 
         if mask_type == cls.LOW_PASS:
             weight = 1.0 / (n * n)
-            return cls.any_shape(n, n, weight)
+            return cls.any_shape(mask_type, mask_neighbor, n, n, weight)
 
         if mask_type == cls.GAUSSIAN:
             pass
+
+        if mask_type == cls.LAPLASSIAN:
+            instance = cls.any_shape(mask_type, mask_neighbor, n, n, 1)
+            center_index = n // 2
+
+            # laplassian with 4 neighbor
+            if mask_neighbor == cls.FOUR_NEIGHBOR:
+                instance.array[center_index][center_index] = -4
+
+                for i in range(n):
+                    for j in range(n):
+                        if i == center_index and j == center_index:
+                            continue
+
+                        if i == center_index or j == center_index:
+                            instance.array[i][j] = 0
+
+            if mask_neighbor == cls.EIGHT_NEIGHBOR:
+                instance.array[center_index][center_index] = -8
+
+            return instance
 
         raise ValueError(f"Unknown mask type: {mask_type}")
 
@@ -54,7 +85,7 @@ class Mask:
 
         return True
 
-    def get_list(self, center_i: int, center_j: int, img_data: np.ndarray) -> list:
+    def get_list(self, center_i: int, center_j: int, img_data: np.ndarray) -> List:
         mask_h, mask_w = self.shape
         flat_roi = []
 
@@ -75,4 +106,4 @@ class Mask:
             for j in range(mask_w):
                 array[i][j] = mask.array[mask_h - i - 1][mask_w - j - 1]
 
-        return cls(array, mask_h, mask_w)
+        return cls(array, mask.mask_type, mask.mask_neighbor, mask_h, mask_w)
