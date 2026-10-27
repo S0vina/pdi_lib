@@ -1,6 +1,7 @@
-from core.plugins.Image import Image
-from core.plugins.Histogram import Histogram
-from core.plugins.Equalizer import Equalizer
+from pdi import Image
+from pdi import Histogram
+from pdi import Equalizer
+
 from pathlib import Path
 
 if __name__ == "__main__":

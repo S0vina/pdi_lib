@@ -3,7 +3,7 @@ from .src import (
     Mask,
     Histogram,
     Equalizer,
-    IntesintyTransforms,
+    IntensityTransforms,
     LinearSpatialFilter,
     NonLinearSpatialFilter,
 )

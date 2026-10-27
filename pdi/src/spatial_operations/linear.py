@@ -1,5 +1,5 @@
-from src.plugins.Image import Image
-from src.plugins.Mask import Mask
+from pdi.src.core.image import Image
+from pdi.src.core.mask import Mask
 import numpy as np
 
 

@@ -1,4 +1,4 @@
-from pdi import Image
+from pdi.src.core.image import Image
 import numpy as np
 
 

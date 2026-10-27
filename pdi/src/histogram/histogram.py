@@ -1,7 +1,8 @@
-from typing import List, Optional
+from typing import Optional
 import numpy as np
-from .Image import Image
 import matplotlib.pyplot as plt
+
+from pdi.src.core.image import Image
 
 
 class Histogram:
