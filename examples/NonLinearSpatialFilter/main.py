@@ -1,5 +1,5 @@
-from src.plugins.Image import Image
-from src.plugins.NonLinearSpatialFilter import NonLinearSpatialFilter
+from pdi import Image
+from pdi import NonLinearSpatialFilter
 
 if __name__ == "__main__":
     img_data = Image.get_data_from_file("../../assets/niki_lauda.jpg")

@@ -75,15 +75,39 @@ class Mask:
 
     def it_fits(self, i: int, j: int, img_t: Tuple[int, int]) -> bool:
         img_h, img_w = img_t
-        mask_h, mask_w = self.shape
+        mask_h, mask_w = self.shape  # ou self.height, self.width
 
-        # Verifica se a máscara ultrapassa a altura ou largura da imagem
-        if i + mask_h > img_h:
+        h_half = mask_h // 2
+        w_half = mask_w // 2
+
+        # Verifica limites superiores e esquerdos
+        if i - h_half < 0 or j - w_half < 0:
             return False
-        if j + mask_w > img_w:
+
+        # Verifica limites inferiores e direitos
+        if i + h_half >= img_h or j + w_half >= img_w:
             return False
 
         return True
+
+    def dot_product(
+        self, i: int, j: int, img_data: np.ndarray, img_shape: Tuple[int, int]
+    ):
+
+        # Calcula o deslocamento (offset) do centro
+        h_half = self.height // 2
+        w_half = self.width // 2
+
+        if self.it_fits(i, j, img_shape):
+            roi = img_data[i - h_half : i + h_half + 1, j - w_half : j + w_half + 1]
+
+            if roi.shape == (self.height, self.width):
+                val = round(min(255, max(0, np.sum(roi * self.array))))
+                return int(val)
+
+            return -1
+
+        return img_data[i][j]
 
     def get_list(self, center_i: int, center_j: int, img_data: np.ndarray) -> List:
         mask_h, mask_w = self.shape
