@@ -14,16 +14,19 @@ class LinearSpatialFilter:
         img_h, img_w = img.shape
         mask_h, mask_w = mask.shape
 
-        n_img = np.zeros_like(img.data)
+        result_matrix = np.zeros_like(img.data)
 
         for i in range(img_h):
             for j in range(img_w):
                 if mask.it_fits(i, j, img.shape):
                     roi = img.data[i : i + mask_h, j : j + mask_w]
 
-                    n_img[i][j] = round(min(255, max(0, np.sum(roi * mask.array))))
+                    result_matrix[i][j] = round(
+                        min(255, max(0, np.sum(roi * mask.array)))
+                    )
 
-        return n_img
+        int_matrix = np.clip(result_matrix, 0, 255).astype(np.uint8)
+        return int_matrix
 
     @classmethod
     def convolution(cls, img: Image, mask: Mask) -> np.ndarray:
@@ -32,13 +35,16 @@ class LinearSpatialFilter:
         flipped_mask = Mask.flip(mask)
         f_mask_h, f_mask_w = flipped_mask.shape
 
-        array = np.zeros((img_h, img_w))
+        result_matrix = np.zeros((img_h, img_w))
 
         for i in range(img_h):
             for j in range(img_w):
-                array[i][j] = flipped_mask.dot_product(i, j, img.data, img.shape)
-                print(array[i][j])
-        return array
+                result_matrix[i][j] = flipped_mask.dot_product(
+                    i, j, img.data, img.shape
+                )
+        int_matrix = np.clip(result_matrix, 0, 255).astype(np.uint8)
+
+        return int_matrix
 
     @classmethod
     def low_pass(cls, img: Image):

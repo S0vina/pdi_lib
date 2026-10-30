@@ -8,7 +8,6 @@ if __name__ == "__main__":
     print("imagem original")
 
     low_pass_data = LinearSpatialFilter.low_pass(img)
-    print(low_pass_data)
     print("filtro low pass aplicado")
     lp_img = Image(low_pass_data, "lp_niki")
     lp_img.plot_img()
