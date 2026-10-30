@@ -3,7 +3,7 @@ from pdi import IntensityTransforms
 from pdi import Image
 
 if __name__ == "__main__":
-    path = Path("../../assets/niki_lauda.jpg")
+    path = Path("../../assets/rage_gray.png")
 
     data = Image.get_data_from_file(path)
     img = Image(data, "niki")
@@ -22,5 +22,3 @@ if __name__ == "__main__":
     log_data = IntensityTransforms.logaritmic(img, 25)
     log_img = Image(log_data, "log_niki")
     log_img.plot_img()
-
-    median_img.plot_img()

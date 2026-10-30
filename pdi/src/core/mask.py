@@ -22,7 +22,12 @@ class Mask:
 
     @classmethod
     def any_shape(
-        cls, mask_type, mask_neighbor, height: int, width: int, weight: float
+        cls,
+        mask_type,
+        mask_neighbor=None,
+        height: int = -1,
+        width: int = -1,
+        weight: float = 0,
     ) -> Self:
         if height < 0 or width < 0:
             raise ValueError("height and width values should be greater than 0")
@@ -33,7 +38,6 @@ class Mask:
 
     @classmethod
     def from_type(cls, mask_type, mask_neighbor, n: int = 3) -> Self:
-        print(mask_type)
         if mask_type is None:
             raise ValueError("mask type should be specified")
 
@@ -44,8 +48,25 @@ class Mask:
             raise ValueError("a pair mask is not implemented in this lib")
 
         if mask_type == cls.LOW_PASS:
-            weight = 1.0 / (n * n)
-            return cls.any_shape(mask_type, mask_neighbor, n, n, weight)
+            center = n // 2
+
+            if mask_neighbor == cls.FOUR_NEIGHBOR:
+                weight = 1.0 / (2 * n - 1)
+                kernel = cls.any_shape(mask_type, mask_neighbor, n, n, 0)
+                kernel_h, kernel_w = kernel.shape
+
+                for i in range(kernel_h):
+                    for j in range(kernel_w):
+                        if i == center or j == center:
+                            kernel.array[i][j] = weight
+
+                return kernel
+
+            if mask_neighbor == cls.EIGHT_NEIGHBOR:
+                weight = 1.0 / (n * n)
+                kernel = cls.any_shape(mask_type, mask_neighbor, n, n, weight)
+
+                return kernel
 
         if mask_type == cls.GAUSSIAN:
             pass
