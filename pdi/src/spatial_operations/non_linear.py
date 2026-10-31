@@ -62,3 +62,7 @@ class NonLinearSpatialFilter:
                     matriz[i][j] = roi[pointer_value]
 
         return matriz
+
+    @classmethod
+    def adaptive_denoise(cls, img: Image, n: int, noise_variance: float):
+        pass

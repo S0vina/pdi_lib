@@ -143,6 +143,13 @@ class Mask:
 
         return flat_roi
 
+    def get_local_mean(self, i: int, j: int, img_data:np.ndarray):
+        mask_h, mask_w = self.shape
+        roi = img_data[]
+
+    def get_local_variance(self):
+        pass
+
     @classmethod
     def flip(cls, mask: Self) -> Self:
         mask_h, mask_w = mask.shape
