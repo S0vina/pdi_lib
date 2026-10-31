@@ -118,7 +118,6 @@ class Mask:
         img_data: np.ndarray,
         img_shape: Tuple[int, int],
         float_type: bool = False,
-        squared: bool = False,
     ):
 
         # Calcula o deslocamento (offset) do centro
@@ -127,9 +126,6 @@ class Mask:
 
         if self.it_fits(i, j, img_shape):
             roi = img_data[i - h_half : i + h_half + 1, j - w_half : j + w_half + 1]
-
-            if squared:
-                roi = roi**2
 
             if roi.shape == (self.height, self.width):
                 val = round(min(255, max(0, np.sum(roi * self.array))))
@@ -169,12 +165,12 @@ class Mask:
                 "The mask type should be a low_pass for calculate the avarege"
             )
 
-        squared_av = local_avarage**2
-        av_of_squares = self.dot_product(
+        squared_avg = local_avarage**2
+        avg_of_squares = self.dot_product(
             i, j, img_data, img_shape, float_type=True, squared=True
         )
 
-        variance = max(0, av_of_squares - squared_av)
+        variance = max(0, avg_of_squares - squared_avg)
         return variance
 
     @classmethod
