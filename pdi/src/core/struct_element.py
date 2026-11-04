@@ -1,5 +1,5 @@
 from .mask import Mask
-from typing import List, Self, Tuple
+from typing import Self, Tuple
 import numpy as np
 
 
@@ -48,6 +48,7 @@ class StructElement(Mask):
         center_j: int,
         img_t: Tuple[int, int],
         img_array: np.ndarray = np.zeros((1, 1)),
+        dilatation: bool = False,
     ) -> bool:
 
         img_h, img_w = img_t
@@ -58,6 +59,10 @@ class StructElement(Mask):
 
         for i in range(mask_h):
             for j in range(mask_w):
+                mask_val = self.array[i][j]
+
+                if not mask_val:  # Equivalente a mask_val == 0 ou False
+                    continue
                 # posicao real na imagem
                 img_r = center_i + (i - h_half)
                 img_c = center_j + (j - w_half)
@@ -68,9 +73,14 @@ class StructElement(Mask):
                 else:
                     pixel_val = img_array[img_r][img_c]
 
-                mask_val = self.array[i][j]
+                if dilatation:
+                    # Se for dilatação: achou um '1' na imagem onde a máscara pedia?
+                    # Então a máscara toca a imagem, logo retorna True imediatamente!
+                    if pixel_val == 1:
+                        return True
+                    else:
+                        # Se for erosão: se algum ponto ativo falhar e não for 1, rejeita.
+                        if pixel_val != 1:
+                            return False
 
-                if mask_val and pixel_val != mask_val:
-                    return False
-
-        return True
+        return False if dilatation else True
