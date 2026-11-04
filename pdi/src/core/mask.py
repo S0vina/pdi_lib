@@ -24,7 +24,7 @@ class Mask:
     def any_shape(
         cls,
         mask_type,
-        mask_neighbor=None,
+        mask_neighboor=None,
         height: int = -1,
         width: int = -1,
         weight: float = 0,
@@ -34,7 +34,7 @@ class Mask:
 
         array = np.full((height, width), weight)
 
-        return cls(array, mask_type, mask_neighbor, height, width)
+        return cls(array, mask_type, mask_neighboor, height, width)
 
     @classmethod
     def from_type(cls, mask_type, mask_neighbor, n: int = 3) -> Self:
