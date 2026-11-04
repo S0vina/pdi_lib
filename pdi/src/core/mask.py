@@ -94,7 +94,7 @@ class Mask:
 
         raise ValueError(f"Unknown mask type: {mask_type}")
 
-    def it_fits(self, i: int, j: int, img_t: Tuple[int, int]) -> bool:
+    def it_fits(self, center_i: int, center_j: int, img_t: Tuple[int, int]) -> bool:
         img_h, img_w = img_t
         mask_h, mask_w = self.shape  # ou self.height, self.width
 
@@ -102,11 +102,11 @@ class Mask:
         w_half = mask_w // 2
 
         # Verifica limites superiores e esquerdos
-        if i - h_half < 0 or j - w_half < 0:
+        if center_i - h_half < 0 or center_j - w_half < 0:
             return False
 
         # Verifica limites inferiores e direitos
-        if i + h_half >= img_h or j + w_half >= img_w:
+        if center_i + h_half >= img_h or center_j + w_half >= img_w:
             return False
 
         return True
