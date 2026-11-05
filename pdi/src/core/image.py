@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Tuple, Union
+from matplotlib import cm
 import numpy as np
+import matplotlib.pyplot as plt
 import cv2
 
 
@@ -44,13 +46,8 @@ class Image:
         cv2.imwrite(path, self._data)
 
     def plot_img(self):
-        while True:
-            cv2.imshow(self.name, self.data)
-
-            if cv2.waitKey(0) & 0xFF == ord("q"):
-                break
-
-        cv2.destroyAllWindows()
+        plt.imshow(self.data, cmap="gray")
+        plt.show()
 
     def __repr__(self) -> str:
         return f"<Image shape={self.shape} dtype={self._data.dtype}>"

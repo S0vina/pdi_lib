@@ -5,8 +5,7 @@ import numpy as np
 
 class StructElement(Mask):
     # Variaveis globais vão ser definidas dessa forma
-    AFINAMENTO = "AFINAMENTO"
-    PREENCHIMENTO_DE_BURACOS = "PREENCHIMENTO_DE_BURACOS"
+    STAR = "star"
 
     def __init__(self, array, mt, mn, h: int, w: int) -> None:
         super().__init__(array, mt, mn, h, w)
@@ -40,7 +39,12 @@ class StructElement(Mask):
         if n % 2 != 1:
             raise ValueError("a pair mask is not implemented in this lib")
 
-        pass
+        if mask_type == Self.STAR:
+            se = Self.any_shape(mask_type, mask_neighbor, 3, 3)
+
+            for i in range(3):
+                for j in range(3):
+                    
 
     def it_fits(
         self,
@@ -59,6 +63,7 @@ class StructElement(Mask):
 
         for i in range(mask_h):
             for j in range(mask_w):
+                # CAPTURA DOS VALORES DA IMAGEM DE ENTRADA E MASCARA
                 mask_val = self.array[i][j]
 
                 if not mask_val:  # Equivalente a mask_val == 0 ou False
@@ -69,18 +74,17 @@ class StructElement(Mask):
 
                 # regiões fora de borda como 0
                 if img_r < 0 or img_r >= img_h or img_c < 0 or img_c >= img_w:
-                    pixel_val = 0
+                    pixel_val = 255
                 else:
                     pixel_val = img_array[img_r][img_c]
 
+                # AQUI É A DEFINIÇÃO DE SE O ELEMENTO ESTRUTURANTE CABE
                 if dilatation:
-                    # Se for dilatação: achou um '1' na imagem onde a máscara pedia?
-                    # Então a máscara toca a imagem, logo retorna True imediatamente!
-                    if pixel_val == 1:
+                    if pixel_val == 0:
                         return True
-                    else:
-                        # Se for erosão: se algum ponto ativo falhar e não for 1, rejeita.
-                        if pixel_val != 1:
-                            return False
+                else:
+                    # Se for erosão: se algum ponto ativo falhar e não for 1, rejeita.
+                    if pixel_val != 0:
+                        return False
 
         return False if dilatation else True

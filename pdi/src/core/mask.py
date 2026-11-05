@@ -166,9 +166,7 @@ class Mask:
             )
 
         squared_avg = local_avarage**2
-        avg_of_squares = self.dot_product(
-            i, j, img_data, img_shape, float_type=True, squared=True
-        )
+        avg_of_squares = self.dot_product(i, j, img_data, img_shape, float_type=True)
 
         variance = max(0, avg_of_squares - squared_avg)
         return variance
