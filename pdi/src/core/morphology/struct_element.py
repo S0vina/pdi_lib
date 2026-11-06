@@ -1,5 +1,5 @@
 from pdi.src.core.mask import Mask
-from typing import Self, Tuple
+from typing import Self, Tuple, List
 import numpy as np
 
 
@@ -106,6 +106,21 @@ class StructElement(Mask):
                     return False
 
         return True
+
+    def get_list(self, center_i: int, center_j: int, img_data: np.ndarray) -> List:
+        mask_h, mask_w = self.shape
+        img_h, img_w = img_data.shape[:2]
+        flat_roi = []
+
+        half_h = mask_h // 2
+        half_w = mask_w // 2
+
+        for r in range(center_i - half_h, center_i + half_h + 1):
+            for c in range(center_j - half_w, center_j + half_w + 1):
+                if 0 <= r < img_h and 0 <= c < img_w:
+                    flat_roi.append(img_data[r][c] - self.array[r][c])
+
+        return flat_roi
 
     # TALVEZ NÃO SIRVA MAIS PARA PORRA NENHUMA. JOGAR FORA DPS
     def it_fits(
