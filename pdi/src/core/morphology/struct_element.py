@@ -1,4 +1,4 @@
-from .mask import Mask
+from pdi.src.core.mask import Mask
 from typing import Self, Tuple
 import numpy as np
 
@@ -39,13 +39,75 @@ class StructElement(Mask):
         if n % 2 != 1:
             raise ValueError("a pair mask is not implemented in this lib")
 
-        if mask_type == Self.STAR:
-            se = Self.any_shape(mask_type, mask_neighbor, 3, 3)
+        if mask_type == cls.STAR:
+            se = cls.any_shape(mask_type, mask_neighbor, 3, 3)
 
             for i in range(3):
                 for j in range(3):
-                    
+                    pass
 
+    # Kernel mapping for Dilatation operation
+    def _hits(
+        self, center_i, center_j, img_matrix: np.ndarray, img_shape: Tuple[int, int]
+    ) -> bool:
+        img_h, img_w = img_shape
+        mask_h, mask_w = self.shape  # ou self.height, self.width
+
+        h_half = mask_h // 2
+        w_half = mask_w // 2
+
+        for i in range(mask_h):
+            for j in range(mask_w):
+                mask_val = self.array[i][j]
+
+                if not mask_val:
+                    continue
+
+                img_r = center_i + (i - h_half)
+                img_c = center_j + (j - w_half)
+
+                # regiões fora de borda como 0
+                if img_r < 0 or img_r >= img_h or img_c < 0 or img_c >= img_w:
+                    pixel_val = 0
+                else:
+                    pixel_val = img_matrix[img_r][img_c]
+
+                if pixel_val == 0:
+                    return True
+
+        return False
+
+    def _fits(
+        self, center_i, center_j, img_matrix: np.ndarray, img_shape: Tuple[int, int]
+    ) -> bool:
+        img_h, img_w = img_shape
+        mask_h, mask_w = self.shape  # ou self.height, self.width
+
+        h_half = mask_h // 2
+        w_half = mask_w // 2
+
+        for i in range(mask_h):
+            for j in range(mask_w):
+                mask_val = self.array[i][j]
+
+                if not mask_val:
+                    continue
+
+                img_r = center_i + (i - h_half)
+                img_c = center_j + (j - w_half)
+
+                # regiões fora de borda como 0
+                if img_r < 0 or img_r >= img_h or img_c < 0 or img_c >= img_w:
+                    pixel_val = 255
+                else:
+                    pixel_val = img_matrix[img_r][img_c]
+
+                if pixel_val != 0:
+                    return False
+
+        return True
+
+    # TALVEZ NÃO SIRVA MAIS PARA PORRA NENHUMA. JOGAR FORA DPS
     def it_fits(
         self,
         center_i: int,
