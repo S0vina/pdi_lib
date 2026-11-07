@@ -29,6 +29,10 @@ class StructElement(Mask):
         return cls(array, mask_type, mask_neighboor, height, width)
 
     @classmethod
+    def generate_kernel_sequence(cls, max_n: int, weight: int) -> List[Self]:
+        return [cls.any_shape(n, weight) for n in range(1, max_n + 1, 2)]
+
+    @classmethod
     def from_type(cls, mask_type, mask_neighbor, n: int = 3) -> Self:
         if mask_type is None:
             raise ValueError("mask type should be specified")
