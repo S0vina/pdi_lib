@@ -7,5 +7,10 @@ from .src import (
     IntensityTransforms,
     LinearSpatialFilter,
     NonLinearSpatialFilter,
-    Morphology,
+    BinaryMorphology,
+    GrayScaleMorphology,
+    MorphologicalGrayOps,
+    MorphologicalOps,
+    MorphologicalReconstructors,
+    Avaliate,
 )
