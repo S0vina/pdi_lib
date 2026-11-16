@@ -46,23 +46,7 @@ class Avaliate:
         return psnr_val
 
     @classmethod
-    def ssim(cls, ref_img: )
-
-    @classmethod
-    def avaliate(cls, img_ref, img_proc, label=""):
-        """
-        args:
-            img_ref  : im1agem original (uint8, cinza)
-            img_proc : imagem após filtragem (uint8, cinza)
-
-        return:
-            p, s
-        """
-        p = psnr(img_ref, img_proc, data_range=255)
-
-        is_color = img_ref.ndim == 3
-        s = ssim(
-            img_ref, img_proc, data_range=255, channel_axis=-1 if is_color else None
-        )
-
-        return p, s
+    def ssim(
+        cls, src_img: np.ndarray, proc_img: np.ndarray, img_shape: Tuple[int, int]
+    ):
+        pass
