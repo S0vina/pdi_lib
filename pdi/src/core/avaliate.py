@@ -34,12 +34,12 @@ class Avaliate:
 
             return mse
 
-        mse_val = mse(src, proc_img, img_shape)
+        mse_val = mse(src_img, proc_img, img_shape)
 
         if mse_val == 0:
             return float("inf")
 
-        max_val = np.iinfo(ref_img.dtype).max
+        max_val = np.iinfo(src_img.dtype).max
 
         psnr_val = 20 * math.log10(max_val / math.sqrt(mse_val))
 
@@ -47,6 +47,13 @@ class Avaliate:
 
     @classmethod
     def ssim(
-        cls, src_img: np.ndarray, proc_img: np.ndarray, img_shape: Tuple[int, int]
+        cls,
+        src_img: np.ndarray,
+        proc_img: np.ndarray,
+        img_shape: Tuple[int, int],
+        waste_map: bool = False,
+        lum_exp: float = 1,
+        cont_exp: float = 1,
+        struct_exp: float = 1,
     ):
         pass
