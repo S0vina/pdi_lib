@@ -1,4 +1,3 @@
-from pdi.src.core.image import Image
 from pdi.src.core.morphology.grayscale import GrayScaleMorphology
 from pdi.src.core.morphology.grayscale import StructElement
 
