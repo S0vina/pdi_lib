@@ -31,41 +31,47 @@ class MorphologicalGrayOps:
         return result
 
     @classmethod
-    def morphological_gradient(cls, img: Image, kernel: StructElement):
-        dilatation = GrayScaleMorphology.dilatation(img.data, img.shape, kernel)
-        erosion = GrayScaleMorphology.erosion(img.data, img.shape, kernel)
+    def morphological_gradient(
+        cls, img_matrix: np.ndarray, img_shape: Tuple[int, int], kernel: StructElement
+    ):
+        dilatation = GrayScaleMorphology.dilatation(img_matrix, img_shape, kernel)
+        erosion = GrayScaleMorphology.erosion(img_matrix, img_shape, kernel)
 
         result = dilatation - erosion
 
         return result
 
     @classmethod
-    def top_hat_transform(cls, img: Image, kernel: StructElement):
-        opening = cls.opening(img.data, img.shape, kernel)
-        result = img.data - opening
+    def top_hat_transform(
+        cls, img_matrix: np.ndarray, img_shape: Tuple[int, int], kernel: StructElement
+    ):
+        opening = cls.opening(img_matrix, img_shape, kernel)
+        result = img_matrix - opening
 
         return result
 
     @classmethod
-    def bottom_hat_transform(cls, img: Image, kernel: StructElement):
-        closing = cls.closing(img.data, img.shape, kernel)
-        result = img.data - closing
+    def bottom_hat_transform(
+        cls, img_matrix: np.ndarray, img_shape: Tuple[int, int], kernel: StructElement
+    ):
+        closing = cls.closing(img_matrix, img_shape, kernel)
+        result = img_matrix - closing
 
         return result
 
     @classmethod
     def granulometry(
         cls,
-        img: Image,
+        img_matrix: np.ndarray,
         img_shape: Tuple[int, int],
         kernel_sequence: List[StructElement],
     ) -> List[float]:
 
-        reference_sum = img.data.sum()
+        reference_sum = img_matrix.sum()
         curve = []
 
         for kernel in kernel_sequence:
-            opened = cls.opening(img.data, img.shape, kernel)
+            opened = cls.opening(img_matrix, img_shape, kernel)
             current_sum = opened.sum()
             curve.append((reference_sum - current_sum) / reference_sum * 100)
 
@@ -73,13 +79,16 @@ class MorphologicalGrayOps:
 
     @classmethod
     def alternate_sequential_filter(
-        cls, img: Image, kernel_sequence: List[StructElement]
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        kernel_sequence: List[StructElement],
     ) -> np.ndarray:
 
-        result = img.data.copy()
+        result = img_matrix.copy()
 
         for kernel in kernel_sequence:
-            result = cls.opening(result, img.shape, kernel)
-            result = cls.closing(result, img.shape, kernel)
+            result = cls.opening(result, img_shape, kernel)
+            result = cls.closing(result, img_shape, kernel)
 
         return result

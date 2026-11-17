@@ -1,5 +1,3 @@
-from skimage.metrics import peak_signal_noise_ratio as psnr
-from skimage.metrics import structural_similarity as ssim
 from .mask import Mask
 from typing import Tuple, Self
 import numpy as np
@@ -28,7 +26,7 @@ class Avaliate:
 
             for i in range(img_h):
                 for j in range(img_w):
-                    sum += (r_img[i][j] - p_img[i][j]) ** 2
+                    sum += (src_img[i][j] - p_img[i][j]) ** 2
 
             mse = sum / weight
 
