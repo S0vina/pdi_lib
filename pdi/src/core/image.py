@@ -10,7 +10,7 @@ class Image:
         pass
 
     @classmethod
-    def get_matrix(cls, path: Union[str, Path]) -> np.ndarray:
+    def get_data(cls, path: Union[str, Path]) -> np.ndarray:
         try:
             img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
             arr = np.asarray(img)

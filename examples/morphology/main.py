@@ -5,33 +5,26 @@ from pdi import BinaryMorphology
 from pdi import MorphologicalOps
 
 if __name__ == "__main__":
-    img_data = Image.get_data_from_file("../../assets/rage_gray.png")
-    img = Image(img_data, "cavalos")
+    src_img = Image.get_data("../../assets/rage_gray.png")
 
-    cavalo_pb = IntensityTransforms.threshold(img, 240)
-    cavalo_pb = Image(cavalo_pb, "")
+    bw_img = IntensityTransforms.threshold(src_img, src_img.shape)
 
-    cavalo_pb.plot_img()
+    print("=== Source Image ===")
+    Image.plot(bw_img)
 
     kernel = StructElement.any_shape(None, None, 7, 7)
 
-    cavalo_erosion = BinaryMorphology.erosion(cavalo_pb.data, cavalo_pb.shape, kernel)
-    cavalo_erosion = Image(cavalo_erosion, "lena_dil")
-
-    cavalo_pb.plot_img()
+    erosion_img = BinaryMorphology.erosion(bw_img, bw_img.shape, kernel)
 
     print("=== erosão ===")
+    Image.plot(erosion_img)
 
-    cavalo_open = MorphologicalOps.opening(cavalo_pb.data, cavalo_pb.shape, kernel)
-    cavalo_open = Image(cavalo_open, "lena_open")
-
-    cavalo_open.plot_img()
+    open_img = MorphologicalOps.opening(bw_img, bw_img.shape, kernel)
 
     print("=== opening ===")
+    Image.plot(open_img)
 
-    cavalo_close = MorphologicalOps.closing(cavalo_pb.data, cavalo_pb.shape, kernel)
-    cavalo_close = Image(cavalo_close, "lena_closes")
-
-    cavalo_close.plot_img()
+    close_img = MorphologicalOps.closing(bw_img, bw_img.shape, kernel)
 
     print("=== Closing ===")
+    Image.plot(close_img)
