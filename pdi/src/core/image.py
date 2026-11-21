@@ -1,6 +1,5 @@
 from pathlib import Path
-from typing import Tuple, Union
-from matplotlib import cm
+from typing import Union
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -8,30 +7,10 @@ import cv2
 
 class Image:
     def __init__(self, data: np.ndarray, name: str):
-        if not isinstance(data, np.ndarray):
-            raise TypeError("Os dados da imagem devem ser um numpy.ndarray")
-
-        self._data = data
-        self._img_name = name
-
-    @property
-    def data(self) -> np.ndarray:
-        return self._data
-
-    @property
-    def name(self) -> str:
-        return self._img_name
-
-    @property
-    def shape(self) -> Tuple[int, int]:
-        return self._data.shape
-
-    @property
-    def is_grayscale(self) -> bool:
-        return True
+        pass
 
     @classmethod
-    def get_data_from_file(cls, path: Union[str, Path]) -> np.ndarray:
+    def get_matrix(cls, path: Union[str, Path]) -> np.ndarray:
         try:
             img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
             arr = np.asarray(img)
@@ -42,12 +21,10 @@ class Image:
             raise IOError(f"The image opened on {path} has an issue: {e}")
 
     @classmethod
-    def save_img(cls, self, path: Union[str, Path]) -> None:
-        cv2.imwrite(path, self._data)
+    def save(cls, matrix: np.ndarray, path: Union[str, Path]) -> None:
+        cv2.imwrite(path, matrix)
 
-    def plot_img(self):
-        plt.imshow(self.data, cmap="gray")
+    @classmethod
+    def plot(cls, matrix: np.ndarray):
+        plt.imshow(matrix, cmap="gray")
         plt.show()
-
-    def __repr__(self) -> str:
-        return f"<Image shape={self.shape} dtype={self._data.dtype}>"

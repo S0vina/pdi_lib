@@ -4,4 +4,4 @@ from .mask import Mask
 from .morphology.grayscale import GrayScaleMorphology
 from .morphology.struct_element import StructElement
 from .morphology.binary import BinaryMorphology
-from avaliate import Avaliate
+from .avaliate import Avaliate

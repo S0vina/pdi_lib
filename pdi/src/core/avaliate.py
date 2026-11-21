@@ -1,5 +1,4 @@
-from .mask import Mask
-from typing import Tuple, Self
+from typing import Tuple
 import numpy as np
 import math
 

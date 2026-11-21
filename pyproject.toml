@@ -14,12 +14,7 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
 ]
-dependencies = [
-  "opencv-python>=4.5.0",
-  "numpy>=1.20.0",
-  "matplotlib>=3.3.0",
-  "scikit-image>=0.24.0",
-]
+dependencies = ["opencv-python>=4.5.0", "numpy>=1.20.0", "matplotlib>=3.3.0"]
 
 [tool.setuptools.packages.find]
 where = ["."]
