@@ -19,7 +19,7 @@ if __name__ == "__main__":
     erosion_img = BinaryMorphology.erosion(bw_img, bw_img.shape, kernel)
 
     print("=== erosão ===")
-    Image.plot(erosion_img)
+    Image.compare(bw_img, erosion_img)
 
     open_img = MorphologicalOps.opening(bw_img, bw_img.shape, kernel)
 

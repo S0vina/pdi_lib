@@ -21,10 +21,31 @@ class Image:
             raise IOError(f"The image opened on {path} has an issue: {e}")
 
     @classmethod
-    def save(cls, matrix: np.ndarray, path: Union[str, Path]) -> None:
-        cv2.imwrite(path, matrix)
+    def save(cls, img: np.ndarray, path: Union[str, Path]) -> None:
+        cv2.imwrite(path, img)
 
     @classmethod
-    def plot(cls, matrix: np.ndarray):
-        plt.imshow(matrix, cmap="gray")
+    def plot(cls, img: np.ndarray):
+        plt.imshow(img, cmap="gray")
         plt.show()
+
+    @classmethod
+    def compare(cls, img_one: np.ndarray, img_two: np.ndarray):
+        fig, ax = plt.subplot_mosaic([["img_one, img_two"]], figsize=(7, 3.5))
+
+        ax["img_one"].imshow(img_one)
+        ax["img_one"].set_title("img_one")
+        ax["img_one"].axis("off")
+
+        ax["img_two"].imshow(img_two)
+        ax["img_two"].set_title("img_two")
+        ax["img_two"].axis("off")
+
+        plt.show()
+
+        fig, ax = plt.subplot_mosaic([["hopper", "mri"]], figsize=(7, 3.5))
+
+        ax["hopper"].imshow(image)
+        ax["hopper"].axis("off")  # clear x-axis and y-axis
+
+        im = ax["mri"].imshow(A, cmap="hot", origin="upper", extent=extent)
