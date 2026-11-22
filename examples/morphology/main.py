@@ -1,3 +1,5 @@
+from matplotlib.pyplot import fill, plot
+
 from pdi import Image
 from pdi import StructElement
 from pdi import IntensityTransforms
@@ -28,3 +30,26 @@ if __name__ == "__main__":
 
     print("=== Closing ===")
     Image.plot(close_img)
+
+    boundary_img = MorphologicalOps.boudary_extraction(bw_img, bw_img.shape, kernel)
+
+    print("=== Boundary Extraction ===")
+    Image.plot(boundary_img)
+
+    # kernels = [#list of kernels for convex_hull]
+    # convex_img = MorphologicalOps.convex_hull(bw_img, bw_img.shape, kernels)
+
+    # print("=== Convex Hull ===")
+    # Image.plot(convex_img)
+
+    filling_img = MorphologicalOps.hole_filling(bw_img, bw_img.shape, kernel)
+
+    print("=== Hole Filling ===")
+    Image.plot(filling_img)
+
+    components = MorphologicalOps.connected_components_extraction(
+        bw_img, bw_img.shape, kernel
+    )
+
+    print("=== Connected Components ===")
+    print(components)
