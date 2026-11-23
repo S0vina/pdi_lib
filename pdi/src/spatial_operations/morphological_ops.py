@@ -60,7 +60,7 @@ class MorphologicalOps:
         img_shape: Tuple[int, int],
         struct_element: StructElement,
     ) -> np.ndarray:
-        not_img = 1 - img_matrix
+        not_img = 255 - img_matrix
 
         x_matrix = np.zeros_like(img_matrix)
 
@@ -74,14 +74,14 @@ class MorphologicalOps:
             dilated = BinaryMorphology.dilatation(
                 x_matrix, img_shape, struct_element
             ).astype(np.uint8)
-            x_matrix = np.logical_and(dilated, not_img).astype(np.uint8)
+            x_matrix = np.bitwise_and(dilated, not_img).astype(np.uint8)
             # no change between dilatations
             if np.array_equal(k_minusone_matrix, x_matrix):
                 break
 
         holes = not_img - x_matrix
 
-        hole_filed = np.logical_or(holes, img_matrix)
+        hole_filed = np.bitwise_or(holes, img_matrix)
         return hole_filed
 
     @classmethod
