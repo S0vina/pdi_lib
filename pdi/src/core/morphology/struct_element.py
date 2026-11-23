@@ -76,7 +76,7 @@ class StructElement(Mask):
                 else:
                     pixel_val = img_matrix[img_r][img_c]
 
-                if pixel_val == 0:
+                if pixel_val == 255:
                     return True
 
         return False
@@ -102,11 +102,11 @@ class StructElement(Mask):
 
                 # regiões fora de borda como 0
                 if img_r < 0 or img_r >= img_h or img_c < 0 or img_c >= img_w:
-                    pixel_val = 255
+                    pixel_val = 0
                 else:
                     pixel_val = img_matrix[img_r][img_c]
 
-                if pixel_val != 0:
+                if pixel_val != 255:
                     return False
 
         return True

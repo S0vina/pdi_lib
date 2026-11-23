@@ -20,24 +20,24 @@ class BinaryMorphology:
         for i in range(img_h):
             for j in range(img_w):
                 if not struct_element._fits(i, j, img_matrix, img_shape):
-                    result_matrix[i][j] = 255
+                    result_matrix[i][j] = 0
 
         return result_matrix
 
     @classmethod
     def dilatation(
         cls,
-        img_matrix: np.ndarray,
+        img: np.ndarray,
         img_shape: Tuple[int, int],
         struct_element: StructElement,
     ) -> np.ndarray:
         img_h, img_w = img_shape
-        result_matrix = img_matrix.copy()
+        result_matrix = img.copy()
 
         for i in range(img_h):
             for j in range(img_w):
-                if struct_element._hits(i, j, img_matrix, img_shape):
-                    result_matrix[i][j] = 0
+                if struct_element._hits(i, j, img, img_shape):
+                    result_matrix[i][j] = 255
 
         return result_matrix
 

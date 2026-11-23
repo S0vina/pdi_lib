@@ -69,6 +69,8 @@ class MorphologicalOps:
         x_matrix[:, 0] = not_img[:, 0]
         x_matrix[:, -1] = not_img[:, -1]
 
+        print(x_matrix)
+
         while True:
             k_minusone_matrix = np.copy(x_matrix)
             dilated = BinaryMorphology.dilatation(
