@@ -1,27 +1,34 @@
 from pdi.src.core.image import Image
 from pdi.src.core.morphology.struct_element import StructElement
-from pdi.src.spatial_operations.morphological_ops import BinaryMorphology
+from pdi.src.core.morphology.morphology import Morphology
 import numpy as np
 
 
 class MorphologicalReconstructors:
-    def __init__(self) -> None:
-        pass
+    """
+    Reconstrução morfológica por dilatação e erosão iterativas.
+    Opera em imagens binárias {0, 255}. Usa bitwise_and/or para manter
+    a convenção objeto=255 durante todo o loop iterativo.
+    """
 
     @classmethod
     def reconstruction_by_dilation(
-        cls, marker: Image, mask: Image, struct_element: StructElement
-    ):
+        cls,
+        marker: Image,
+        mask: Image,
+        struct_element: StructElement,
+    ) -> np.ndarray:
+        """
+        Reconstrói pelo marcador crescendo via dilatação até ser contido pela máscara.
+        marker ⊆ mask (ambas {0,255}).
+        """
         result_matrix = marker.data.copy()
 
         while True:
             result_prev = result_matrix.copy()
-
-            dilated = BinaryMorphology.dilatation(
-                result_matrix, marker.shape, struct_element
-            )
-            result_matrix = np.logical_and(dilated, mask.data).astype(np.uint8)
-
+            dilated = Morphology.dilation(result_matrix, marker.shape, struct_element)
+            # interseção em {0,255}
+            result_matrix = np.bitwise_and(dilated, mask.data)
             if np.array_equal(result_matrix, result_prev):
                 break
 
@@ -29,57 +36,61 @@ class MorphologicalReconstructors:
 
     @classmethod
     def reconstruction_by_erosion(
-        cls, marker: Image, mask: Image, struct_element: StructElement
-    ):
+        cls,
+        marker: Image,
+        mask: Image,
+        struct_element: StructElement,
+    ) -> np.ndarray:
+        """
+        Reconstrói pelo marcador encolhendo via erosão até conter a máscara.
+        marker ⊇ mask (ambas {0,255}).
+        """
         result_matrix = marker.data.copy()
 
         while True:
             result_prev = result_matrix.copy()
-
-            eroded = BinaryMorphology.erosion(
-                result_matrix, marker.shape, struct_element
-            )
-            result_matrix = np.logical_or(eroded, mask.data).astype(np.uint8)
-
+            eroded = Morphology.erosion(result_matrix, marker.shape, struct_element)
+            # união em {0,255}
+            result_matrix = np.bitwise_or(eroded, mask.data)
             if np.array_equal(result_matrix, result_prev):
                 break
 
         return result_matrix
 
     @classmethod
-    def opening_by_reconstruction(cls, img: Image, struct_element: StructElement):
-        # Step 1: erode to get marker
-        marker_data = BinaryMorphology.erosion(img.data, img.shape, struct_element)
-        marker = Image(marker_data, "any")  # change this later
-
-        # Step 2: reconstruct by dilation back to mask
+    def opening_by_reconstruction(
+        cls,
+        img: Image,
+        struct_element: StructElement,
+    ) -> np.ndarray:
+        marker_data = Morphology.erosion(img.data, img.shape, struct_element)
+        marker = Image(marker_data, "any")
         return cls.reconstruction_by_dilation(marker, img, struct_element)
 
     @classmethod
-    def closing_by_reconstruction(cls, img: Image, struct_element: StructElement):
-        # Step 1: dilate to get marker
-        marker_data = BinaryMorphology.dilatation(img.data, img.shape, struct_element)
+    def closing_by_reconstruction(
+        cls,
+        img: Image,
+        struct_element: StructElement,
+    ) -> np.ndarray:
+        marker_data = Morphology.dilation(img.data, img.shape, struct_element)
         marker = Image(marker_data, "any")
-
-        # Step 2: reconstruct by erosion back to mask
         return cls.reconstruction_by_erosion(marker, img, struct_element)
 
     @classmethod
-    def clear_border_objects(cls, img: Image, struct_element: StructElement):
-        # Step 1: create marker from border pixels only
+    def clear_border_objects(
+        cls,
+        img: Image,
+        struct_element: StructElement,
+    ) -> np.ndarray:
         marker_data = np.zeros_like(img.data)
-        marker_data[0, :] = img.data[0, :]  # top border
-        marker_data[-1, :] = img.data[-1, :]  # bottom border
-        marker_data[:, 0] = img.data[:, 0]  # left border
-        marker_data[:, -1] = img.data[:, -1]  # right border
+        marker_data[0, :]  = img.data[0, :]
+        marker_data[-1, :] = img.data[-1, :]
+        marker_data[:, 0]  = img.data[:, 0]
+        marker_data[:, -1] = img.data[:, -1]
 
-        marker = Image(marker_data, "any")  # fix that later
-
-        # Step 2: reconstruct by dilation — grows marker through
-        # every object connected to the border
+        marker = Image(marker_data, "any")
         border_objects = cls.reconstruction_by_dilation(marker, img, struct_element)
 
-        # Step 3: subtract border objects from original
-        result = np.logical_and(img.data, ~border_objects).astype(np.uint8)
-
-        return result
+        # remove objetos de borda: interseção com complemento
+        return np.bitwise_and(img.data, ~border_objects)

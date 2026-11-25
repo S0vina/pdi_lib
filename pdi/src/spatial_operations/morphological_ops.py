@@ -127,128 +127,128 @@ class MorphologicalOps:
                     break
 
             components.append((label, D))
-            remaining = np.logical_and(remaining, ~D).astype(
-                np.uint8
-            )  # remove found component
-            label += 1
-
-        return components
-
-    @classmethod
-    def convex_hull(
-        cls,
-        img_matrix: np.ndarray,
-        img_shape: Tuple[int, int],
-        struct_elements: List[StructElement],
-    ):
-        result_matrix = img_matrix.copy()
-
-        while True:
-            result_prev = result_matrix.copy()
-
-            for SE in struct_elements:
-                D = result_matrix.copy()
-
-                while True:
-                    D_prev = D.copy()
-                    hormiss = BinaryMorphology.hit_or_miss_simplified(D, img_shape, SE)
-                    D = np.logical_or(hormiss, D).astype(np.uint8)
+                    D = np.bitwise_or(hormiss, D)
                     if np.array_equal(D, D_prev):
                         break
 
-                result_matrix = np.logical_or(result_matrix, D).astype(np.uint8)
+                result_matrix = np.bitwise_or(result_matrix, D)
 
             if np.array_equal(result_matrix, result_prev):
                 break
 
         return result_matrix
 
+    @classmethod
+    def thinning(
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        struct_elements: List[StructElement],
+    ) -> np.ndarray:
+        result_matrix = img_matrix.copy()
 
-@classmethod
-def tining(
-    cls,
-    img_matrix: np.ndarray,
-    img_shape: Tuple[int, int],
-    struct_elements: List[StructElement],
-):
-    result_matrix = img_matrix.copy()
+        while True:
+            result_prev = result_matrix.copy()
 
-    while True:
-        result_prev = result_matrix.copy()
+            for SE in struct_elements:
+                hitormiss = BinaryMorphology.hit_or_miss_simplified(
+                    result_matrix, img_shape, SE
+                )
+                result_matrix = np.bitwise_and(result_matrix, ~hitormiss)
 
+            if np.array_equal(result_matrix, result_prev):
+                break
+
+        return result_matrix
+
+    @classmethod
+    def skeleton(
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        struct_elements: List[StructElement],
+    ) -> np.ndarray:
+        result_matrix = img_matrix.copy()
+        skel = np.zeros_like(img_matrix)
+
+        while True:
+            result_prev = result_matrix.copy()
+
+            for SE in struct_elements:
+                hitormiss = BinaryMorphology.hit_or_miss_simplified(
+                    result_matrix, img_shape, SE
+                )
+                result_matrix = np.bitwise_and(result_matrix, ~hitormiss)
+
+            # acumula pixels removidos a cada iteração
+            diff = np.bitwise_and(result_prev, ~result_matrix)
+            skel = np.bitwise_or(skel, diff)
+
+            if np.array_equal(result_matrix, result_prev):
+                break
+
+        return skel
+
+    @classmethod
+    def pruning(
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        struct_elements: List[StructElement],
+        iterations: int = 3,
+    ) -> np.ndarray:
+        result_matrix = img_matrix.copy()
+
+        # remove ramos parasitas via afinamento
+        for _ in range(iterations):
+            for SE in struct_elements:
+                hitormiss = BinaryMorphology.hit_or_miss_simplified(
+                    result_matrix, img_shape, SE
+                )
+                result_matrix = np.bitwise_and(result_matrix, ~hitormiss)
+
+        # recupera endpoints que foram removidos
+        endpoints = np.zeros_like(img_matrix)
         for SE in struct_elements:
             hitormiss = BinaryMorphology.hit_or_miss_simplified(
                 result_matrix, img_shape, SE
             )
-            result_matrix = np.logical_and(result_matrix, ~hitormiss).astype(np.uint8)
+            endpoints = np.bitwise_or(endpoints, hitormiss)
 
-        if np.array_equal(result_matrix, result_prev):
-            break
+        # dilata endpoints e intersecta com imagem original para reconectar
+        for _ in range(iterations):
+            endpoints = Morphology.dilation(endpoints, img_shape, struct_elements[0])
+            endpoints = np.bitwise_and(endpoints, img_matrix)
 
-    return result_matrix
-
-
-@classmethod
-def skeleton(
-    cls,
-    img_matrix: np.ndarray,
-    img_shape: Tuple[int, int],
-    struct_elements: List[StructElement],
-):
-    result_matrix = img_matrix.copy()
-    skeleton = np.zeros_like(img_matrix)
-
-    while True:
-        result_prev = result_matrix.copy()
-
-        for SE in struct_elements:
-            hitormiss = BinaryMorphology.hit_or_miss_simplified(
-                result_matrix, img_shape, SE
-            )
-            result_matrix = np.logical_and(result_matrix, ~hitormiss).astype(np.uint8)
-
-        # acumula os pixels removidos do esqueleto
-        skeleton = np.logical_or(skeleton, result_prev - result_matrix).astype(np.uint8)
-
-        if np.array_equal(result_matrix, result_prev):
-            break
-
-    return skeleton
+        return np.bitwise_or(result_matrix, endpoints)
+from pdi.src.core.morphology.struct_element import StructElement
+from pdi.src.core.morphology.morphology import Morphology
+from pdi.src.core.morphology.binary import BinaryMorphology
+from typing import List, Tuple
+import numpy as np
 
 
-@classmethod
-def pruning(
-    cls,
-    img_matrix: np.ndarray,
-    img_shape: Tuple[int, int],
-    struct_elements: List[StructElement],
-    iterations: int = 3,
-):
-    result_matrix = img_matrix.copy()
+class MorphologicalOps:
+    """
+    Operações morfológicas de alto nível para imagens binárias {0, 255}.
+    Todas delegam para Morphology (erosion/dilation via min/max).
+    """
 
-    # Removendo partes parasitas com afinamento
-    for _ in range(iterations):
-        for SE in struct_elements:
-            hitormiss = BinaryMorphology.hit_or_miss_simplified(
-                result_matrix, img_shape, SE
-            )
-            result_matrix = np.logical_and(result_matrix, ~hitormiss).astype(np.uint8)
+    @classmethod
+    def opening(
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        struct_element: StructElement,
+    ) -> np.ndarray:
+        eroded = Morphology.erosion(img_matrix, img_shape, struct_element)
+        return Morphology.dilation(eroded, img_shape, struct_element)
 
-    # Recuperando "endpoints" que foram removidos
-    endpoints = np.zeros_like(img_shape)
-    for SE in struct_elements:
-        hitormiss = BinaryMorphology.hit_or_miss_simplified(
-            result_matrix, img_shape, SE
-        )
-        endpoints = np.logical_or(endpoints, hitormiss).astype(np.uint8)
-    # Dilatando "endpoints" e realizando a intersecção com a imagem original para reconectar
-
-    for _ in range(iterations):
-        endpoints = BinaryMorphology.dilatation(
-            endpoints, img_shape, struct_elements[0]
-        )
-        endpoints = np.logical_and(endpoints, img_matrix).astype(np.uint8)
-
+    @classmethod
+    def closing(
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
     result_matrix = np.logical_or(result_matrix, endpoints).astype(np.uint8)
 
     return result_matrix

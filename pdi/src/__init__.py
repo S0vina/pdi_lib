@@ -2,6 +2,7 @@ from .core import (
     Image,
     Mask,
     StructElement,
+    Morphology,
     GrayScaleMorphology,
     BinaryMorphology,
     Avaliate,

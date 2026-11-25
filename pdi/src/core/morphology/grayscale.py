@@ -1,37 +1,31 @@
 import numpy as np
 from typing import Tuple
 from .struct_element import StructElement
+from .morphology import Morphology
 
 
-class GrayScaleMorphology(StructElement):
-    def __init__(self, array, mt, mn, h: int, w: int) -> None:
-        super().__init__(array, mt, mn, h, w)
+class GrayScaleMorphology:
+    """
+    Morfologia grayscale. Convenção: objeto = 255, fundo = 0.
 
-    @classmethod
-    def dilatation(
-        cls, img_matrix: np.ndarray, img_shape: Tuple[int, int], kernel: StructElement
-    ):
-        img_h, img_w = img_shape
-        result = img_matrix.copy()
-
-        for i in range(img_h):
-            for j in range(img_w):
-                flat_roi = kernel.get_list(i, j, img_matrix)
-
-                result[i][j] = max(flat_roi)
-
-        return result
+    Delega para Morphology (min/max), idêntico à morfologia binária
+    mas operando sobre valores contínuos [0, 255].
+    """
 
     @classmethod
     def erosion(
-        cls, img_matrix: np.ndarray, img_shape: Tuple[int, int], kernel: StructElement
-    ):
-        img_h, img_w = img_shape
-        result = img_matrix.copy()
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        kernel: StructElement,
+    ) -> np.ndarray:
+        return Morphology.erosion(img_matrix, img_shape, kernel)
 
-        for i in range(img_h):
-            for j in range(img_w):
-                flat_roi = kernel.get_list(i, j, img_matrix)
-                result[i][j] = min(flat_roi)
-
-        return result
+    @classmethod
+    def dilatation(
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        kernel: StructElement,
+    ) -> np.ndarray:
+        return Morphology.dilation(img_matrix, img_shape, kernel)
