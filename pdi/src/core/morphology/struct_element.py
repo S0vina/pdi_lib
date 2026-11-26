@@ -111,22 +111,19 @@ class StructElement(Mask):
 
         return True
 
-    def get_list(self, center_i, center_j, img_data):
+    def get_list(self, center_i: int, center_j: int, img_data: np.ndarray) -> List:
         mask_h, mask_w = self.shape
         img_h, img_w = img_data.shape[:2]
         flat_roi = []
-        half_h, half_w = mask_h // 2, mask_w // 2
 
-        for ki in range(mask_h):
-            for kj in range(mask_w):
-                if not self.array[ki][kj]:   # pula posições inativas do SE
-                    continue
-                r = center_i + ki - half_h   # coordenada da imagem
-                c = center_j + kj - half_w
+        half_h = mask_h // 2
+        half_w = mask_w // 2
+
+        for r in range(center_i - half_h, center_i + half_h + 1):
+            for c in range(center_j - half_w, center_j + half_w + 1):
                 if 0 <= r < img_h and 0 <= c < img_w:
-                    flat_roi.append(int(img_data[r][c]))
-                else:
-                    flat_roi.append(0)       # zero-padding
+                    flat_roi.append(img_data[r][c] - self.array[r][c])
+
         return flat_roi
 
     # TALVEZ NÃO SIRVA MAIS PARA PORRA NENHUMA. JOGAR FORA DPS

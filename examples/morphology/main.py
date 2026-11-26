@@ -3,7 +3,7 @@ from matplotlib.pyplot import fill, plot
 from pdi import Image
 from pdi import StructElement
 from pdi import IntensityTransforms
-from pdi import BinaryMorphology
+from pdi import Morphology
 from pdi import MorphologicalOps
 
 if __name__ == "__main__":
@@ -16,12 +16,12 @@ if __name__ == "__main__":
 
     kernel = StructElement.any_shape(None, None, 3, 3)
 
-    dilatation_img = BinaryMorphology.dilatation(bw_img, bw_img.shape, kernel)
+    dilatation_img = Morphology.dilatation(bw_img, bw_img.shape, kernel)
 
     print("=== Dilated Image ===")
     Image.plot(dilatation_img)
 
-    erosion_img = BinaryMorphology.erosion(bw_img, bw_img.shape, kernel)
+    erosion_img = Morphology.erosion(bw_img, bw_img.shape, kernel)
 
     print("=== erosão ===")
     Image.compare(bw_img, erosion_img)

@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import List, Tuple
 import numpy as np
 
 from .struct_element import StructElement
@@ -11,13 +11,8 @@ class Morphology:
     Convenção: objeto = 255, fundo = 0.
     Padding:   zero-padding — pixels fora dos limites são tratados como 0 (fundo).
 
-    Ambas as operações funcionam identicamente para imagens binárias e grayscale:
-      - erosion:  min local sob o elemento estruturante
-      - dilation: max local sob o elemento estruturante
-
-    Para imagens binárias {0, 255}:
-      min retorna 0 se qualquer vizinho for fundo  → erosão encolhe o objeto
-      max retorna 255 se qualquer vizinho for objeto → dilatação expande o objeto
+    erosion:  min local sob o elemento estruturante
+    dilation: max local sob o elemento estruturante
     """
 
     @classmethod
@@ -77,3 +72,63 @@ class Morphology:
                 result[i][j] = max_val
 
         return result
+
+    @classmethod
+    def hit_or_miss(
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        struct_elements: List[StructElement],
+    ) -> np.ndarray:
+        """
+        Detecta padrões exatos com dois SEs disjuntos.
+        Entrada e saída em {0, 255}.
+        """
+        if len(struct_elements) != 2:
+            raise ValueError(
+                f"hit_or_miss requires exactly 2 structuring elements, got {len(struct_elements)}"
+            )
+
+        kernel_one, kernel_two = struct_elements
+
+        if np.any(np.logical_and(kernel_one.array, kernel_two.array)):
+            raise ValueError("B1 and B2 must be disjoint structuring elements")
+
+        img_bin = (img_matrix > 0).astype(np.uint8)
+        not_img  = (1 - img_bin).astype(np.uint8)
+
+        first_match  = cls.erosion(img_bin * 255, img_shape, kernel_one)
+        second_match = cls.erosion(not_img * 255, img_shape, kernel_two)
+
+        result = np.bitwise_and(
+            (first_match > 0).astype(np.uint8),
+            (second_match > 0).astype(np.uint8),
+        )
+        return (result * 255).astype(np.uint8)
+
+    @classmethod
+    def hit_or_miss_simplified(
+        cls,
+        img_matrix: np.ndarray,
+        img_shape: Tuple[int, int],
+        struct_element: StructElement,
+    ) -> np.ndarray:
+        """
+        Hit-or-miss com SE único — complemento gerado automaticamente.
+        Entrada e saída em {0, 255}.
+        """
+        img_bin = (img_matrix > 0).astype(np.uint8)
+        not_img  = (1 - img_bin).astype(np.uint8)
+
+        kernel_two_data = (1 - struct_element.array.astype(np.uint8)).astype(bool)
+        kh, kw = struct_element.shape
+        kernel_two = StructElement(kernel_two_data, None, None, kh, kw)
+
+        first_match  = cls.erosion(img_bin * 255, img_shape, struct_element)
+        second_match = cls.erosion(not_img * 255, img_shape, kernel_two)
+
+        result = np.bitwise_and(
+            (first_match > 0).astype(np.uint8),
+            (second_match > 0).astype(np.uint8),
+        )
+        return (result * 255).astype(np.uint8)

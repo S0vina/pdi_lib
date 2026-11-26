@@ -3,8 +3,6 @@ from .core import (
     Mask,
     StructElement,
     Morphology,
-    GrayScaleMorphology,
-    BinaryMorphology,
     Avaliate,
 )
 from .histogram import Histogram, Equalizer
@@ -14,5 +12,4 @@ from .spatial_operations import (
     NonLinearSpatialFilter,
     MorphologicalOps,
     MorphologicalReconstructors,
-    MorphologicalGrayOps,
 )
