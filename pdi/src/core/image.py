@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
-
 class Image:
     def __init__(self, data: np.ndarray, name: str):
         pass

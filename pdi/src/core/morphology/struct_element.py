@@ -1,11 +1,14 @@
 from pdi.src.core.mask import Mask
 from typing import Self, Tuple, List
 import numpy as np
+import cv2
 
 
 class StructElement(Mask):
     # Variaveis globais vão ser definidas dessa forma
-    STAR = "star"
+    CROSS = "cross"
+    SQUARE = "square"
+    ELIPSE = "elipse"
 
     def __init__(self, array, mt, mn, h: int, w: int) -> None:
         super().__init__(array, mt, mn, h, w)
@@ -15,41 +18,38 @@ class StructElement(Mask):
         cls,
         mask_type,
         mask_neighboor=None,
-        height: int = -1,
-        width: int = -1,
+        height: int = 1,
+        width: int = 1,
         weight: float | bool = True,
     ) -> Self:
 
         if height < 0 or width < 0:
             raise ValueError("height and width values should be greater than 0")
 
-        bool_weight = bool(weight)
-        array = np.full((height, width), bool_weight, dtype=bool)
-
+        array = np.full((height, width), weight, dtype=bool)
         return cls(array, mask_type, mask_neighboor, height, width)
 
     @classmethod
-    def generate_kernel_sequence(cls, max_n: int, weight: int) -> List[Self]:
-        return [cls.any_shape(n, weight) for n in range(1, max_n + 1, 2)]
+    def generate_kernel_sequence(cls, max_n: int, mask_type) -> List[Self]:
+        return [cls.from_type(mask_type, n) for n in range(1, max_n + 1, 2)]
 
     @classmethod
-    def from_type(cls, mask_type, mask_neighbor, n: int = 3) -> Self:
-        if mask_type is None:
-            raise ValueError("mask type should be specified")
-
-        if mask_neighbor is None:
-            raise ValueError("should specify what neighborhood is taken")
-
+    def from_type(cls, mask_type, n: int = 3):
         if n % 2 != 1:
             raise ValueError("a pair mask is not implemented in this lib")
 
-        if mask_type == cls.STAR:
-            se = cls.any_shape(mask_type, mask_neighbor, 3, 3)
+        cv2_map = {
+            cls.CROSS:  cv2.MORPH_CROSS,
+            cls.SQUARE: cv2.MORPH_RECT,
+            cls.ELIPSE: cv2.MORPH_ELLIPSE,
+        }
 
-            for i in range(3):
-                for j in range(3):
-                    pass
+        if mask_type not in cv2_map:
+            raise ValueError(f"Unknown mask type: {mask_type}")
 
+        array = cv2.getStructuringElement(cv2_map[mask_type], (n, n)).astype(bool)
+        return cls(array, mask_type, None, n, n)
+        
     # Kernel mapping for Dilatation operation
     def _hits(
         self, center_i, center_j, img_matrix: np.ndarray, img_shape: Tuple[int, int]

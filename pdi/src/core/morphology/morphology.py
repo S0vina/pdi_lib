@@ -16,14 +16,9 @@ class Morphology:
     """
 
     @classmethod
-    def erosion(
-        cls,
-        img: np.ndarray,
-        img_shape: Tuple[int, int],
-        kernel: StructElement,
-    ) -> np.ndarray:
+    def erosion(cls, img: np.ndarray, kernel: StructElement) -> np.ndarray:
         """Erosão por mínimo local. Funciona para binária e grayscale."""
-        img_h, img_w = img_shape
+        img_h, img_w = img.shape
         kh, kw = kernel.shape
         half_h, half_w = kh // 2, kw // 2
         result = np.zeros_like(img)
@@ -45,14 +40,9 @@ class Morphology:
         return result
 
     @classmethod
-    def dilation(
-        cls,
-        img: np.ndarray,
-        img_shape: Tuple[int, int],
-        kernel: StructElement,
-    ) -> np.ndarray:
+    def dilation(cls, img: np.ndarray, kernel: StructElement) -> np.ndarray:
         """Dilatação por máximo local. Funciona para binária e grayscale."""
-        img_h, img_w = img_shape
+        img_h, img_w = img.shape
         kh, kw = kernel.shape
         half_h, half_w = kh // 2, kw // 2
         result = np.zeros_like(img)
@@ -64,8 +54,8 @@ class Morphology:
                     for kj in range(kw):
                         if not kernel.array[ki][kj]:
                             continue
-                        r = i + ki - half_h
-                        c = j + kj - half_w
+                        r = i + (half_h - ki)
+                        c = j + (half_w - kj)
                         val = int(img[r][c]) if 0 <= r < img_h and 0 <= c < img_w else 0
                         if val > max_val:
                             max_val = val
@@ -75,11 +65,10 @@ class Morphology:
 
     @classmethod
     def hit_or_miss(
-        cls,
-        img_matrix: np.ndarray,
-        img_shape: Tuple[int, int],
-        struct_elements: List[StructElement],
-    ) -> np.ndarray:
+        cls, 
+        img_matrix: np.ndarray, 
+        struct_elements: List[StructElement]
+        ) -> np.ndarray:
         """
         Detecta padrões exatos com dois SEs disjuntos.
         Entrada e saída em {0, 255}.
@@ -97,8 +86,8 @@ class Morphology:
         img_bin = (img_matrix > 0).astype(np.uint8)
         not_img  = (1 - img_bin).astype(np.uint8)
 
-        first_match  = cls.erosion(img_bin * 255, img_shape, kernel_one)
-        second_match = cls.erosion(not_img * 255, img_shape, kernel_two)
+        first_match  = cls.erosion(img_bin * 255, kernel_one)
+        second_match = cls.erosion(not_img * 255, kernel_two)
 
         result = np.bitwise_and(
             (first_match > 0).astype(np.uint8),
@@ -110,9 +99,8 @@ class Morphology:
     def hit_or_miss_simplified(
         cls,
         img_matrix: np.ndarray,
-        img_shape: Tuple[int, int],
         struct_element: StructElement,
-    ) -> np.ndarray:
+        ) -> np.ndarray:
         """
         Hit-or-miss com SE único — complemento gerado automaticamente.
         Entrada e saída em {0, 255}.
@@ -124,8 +112,8 @@ class Morphology:
         kh, kw = struct_element.shape
         kernel_two = StructElement(kernel_two_data, None, None, kh, kw)
 
-        first_match  = cls.erosion(img_bin * 255, img_shape, struct_element)
-        second_match = cls.erosion(not_img * 255, img_shape, kernel_two)
+        first_match  = cls.erosion(img_bin * 255, struct_element)
+        second_match = cls.erosion(not_img * 255, kernel_two)
 
         result = np.bitwise_and(
             (first_match > 0).astype(np.uint8),

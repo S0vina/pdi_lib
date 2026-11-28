@@ -26,7 +26,7 @@ class MorphologicalReconstructors:
 
         while True:
             result_prev = result_matrix.copy()
-            dilated = Morphology.dilation(result_matrix, marker.shape, struct_element)
+            dilated = Morphology.dilation(result_matrix, struct_element)
             # interseção em {0,255}
             result_matrix = np.bitwise_and(dilated, mask.data)
             if np.array_equal(result_matrix, result_prev):
@@ -49,7 +49,7 @@ class MorphologicalReconstructors:
 
         while True:
             result_prev = result_matrix.copy()
-            eroded = Morphology.erosion(result_matrix, marker.shape, struct_element)
+            eroded = Morphology.erosion(result_matrix, struct_element)
             # união em {0,255}
             result_matrix = np.bitwise_or(eroded, mask.data)
             if np.array_equal(result_matrix, result_prev):
@@ -63,7 +63,7 @@ class MorphologicalReconstructors:
         img: Image,
         struct_element: StructElement,
     ) -> np.ndarray:
-        marker_data = Morphology.erosion(img.data, img.shape, struct_element)
+        marker_data = Morphology.erosion(img.data, struct_element)
         marker = Image(marker_data, "any")
         return cls.reconstruction_by_dilation(marker, img, struct_element)
 
@@ -73,7 +73,7 @@ class MorphologicalReconstructors:
         img: Image,
         struct_element: StructElement,
     ) -> np.ndarray:
-        marker_data = Morphology.dilation(img.data, img.shape, struct_element)
+        marker_data = Morphology.dilation(img.data, struct_element)
         marker = Image(marker_data, "any")
         return cls.reconstruction_by_erosion(marker, img, struct_element)
 
